@@ -390,7 +390,7 @@ function submitQuiz() {
   document.getElementById("quizForm").style.display = "none";
   document.getElementById("resultBlock").style.display = "block";
 
-  const passed = score >= Math.ceil(SELECTED_QUESTIONS * 0.7);
+  const passed = score >= Math.ceil(SELECTED_QUESTIONS * 0.9);
   const status = passed
     ? (currentLang === "ru" ? "СДАН" : "TOPSHIRILDI")
     : (currentLang === "ru" ? "НЕ СДАН" : "TOPSHIRILMADI");
