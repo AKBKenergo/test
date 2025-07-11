@@ -1,0 +1,437 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тест по ПТЭ и ПТБ</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #0f1f3d;
+      color: #ffffff;
+      margin: 0;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #1e2f53;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      max-width: 180px;
+      height: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffffff;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    .question {
+      background: #f5f8ff;
+      color: #222;
+      border-left: 5px solid #3c74d9;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+
+    .question:hover {
+      background: #e9f1ff;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #3c74d9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #2e5eb8;
+    }
+
+    select, input[type="password"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #000;
+      transition: 0.3s;
+    }
+
+    select:focus, input[type="password"]:focus {
+      border-color: #3c74d9;
+      outline: none;
+    }
+
+  #quizForm,
+#resultBlock {
+  display: none;
+}
+
+    #timer {
+      font-weight: bold;
+      font-size: 18px;
+      color: #ff5e5e;
+      text-align: right;
+      margin-bottom: 20px;
+    }
+
+    .footer-note {
+      font-size: 13px;
+      text-align: center;
+      color: #bbb;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Логотип -->
+    <div class="logo">
+      <img src="logo.png" alt="Логотип Энергослужбы">
+    </div>
+
+<h2>Тест по ПТЭ и ПТБ (IV группа)AKBK</h2>
+
+<!-- Раздел старта: выбор языка, ввод имени и пароля -->
+<div id="startSection">
+  <label>Язык:</label>
+  <select id="langSelect" onchange="updateLang()">
+    <option value="ru">Русский</option>
+    <option value="uz">O'zbekcha</option>
+  </select><br><br>
+
+  <label><strong>Ф.И.О.:</strong></label>
+  <select id="fioSelect">
+    <option value="">-- Выберите Ф.И.О. --</option>
+    <option>Суланов Фуркат Абдужаббарович</option>
+    <option>Акбархонов Азизхон Козимхон угли</option>
+    <option>Исматов Рахимберди Кушбаевич</option>
+<option>Ладейщиков Александр Викторович</option>
+<option>Мадираимов Абдурахмон Муфозил угли</option>
+<option>Минбаев Дилшод Юлдашбаевич</option>
+<option>Мирисманов Жасур Абдилахакович</option>
+<option>Сатторов Дониёр Бахтиёр угли</option>
+<option>Ярматов Ильхом Гуломжонович</option>
+<option>Закиров Эльдор Шакирджанович</option>
+<option>Тагаев Шомурод Валижонович</option>
+<option>Нурматов Шахзод Хасан угли</option>
+  </select><br>
+
+  <label><strong>Пароль:</strong></label>
+  <input type="password" id="passwordInput"><br>
+
+  <button onclick="startTest()">Начать тест</button>
+</div>
+
+<!-- Основной блок теста -->
+<div id="quizForm">
+  <p><strong>Оставшееся время: <span id="timer">15:00</span></strong></p>
+  <div id="questionBlock" class="question"></div>
+  <button onclick="nextQuestion()">Далее</button>
+</div>
+
+<!-- Блок результата -->
+<div id="resultBlock">
+  <p id="resultText"></p>
+</div>
+
+<!-- JavaScript логика -->
+<script>
+// ✅ Пароли по ФИО (авторизация)
+const users = {
+  	"Суланов Фуркат Абдужаббарович": "2310",
+  	"Акбархонов Азизхон Козимхон угли": "1006",
+  	"Ладейщиков Александр Викторович": "2603",
+	"Закиров Эльдор Шакирджанович": "1504",
+	"Исматов Рахимберди Кушбаевич": "2005",
+	"Мадираимов Абдурахмон Муфозил угли": "2306",
+	"Минбаев Дилшод Юлдашбаевич": "1909",
+	"Мирисманов Жасур Абдилахакович": "1702",
+	"Сатторов Дониёр Бахтиёр угли": "2111",
+	"Ярматов Ильхом Гуломжонович": "2407",
+	"Тагаев Шомурод Валижонович": "1601",
+	"Нурматов Шахзод Хасан угли": "0210",
+};
+
+// ✅ База вопросов по языкам
+const allQuestions = {
+  ru: [
+   { q: "Какие документы оформляются после окончания работ?", a: ["Накладная", "Протокол осмотра, закрытие наряда", "Фотография", "Акт выполненных работ"], correct: "Протокол осмотра, закрытие наряда" },
+  { q: "Что такое отключающее устройство?", a: ["Кнопка", "Аппарат для обесточивания", "Трансформатор", "Термометр"], correct: "Аппарат для обесточивания" },
+  { q: "Что такое рабочее заземление?", a: ["Заземление корпуса", "Заземление для нормальной работы схемы", "Временное заземление", "Нейтраль"], correct: "Заземление для нормальной работы схемы" },
+  { q: "Что такое повторное заземление?", a: ["Резервное", "Дополнительное заземление", "В цепях нуля", "Сверх нормы"], correct: "Дополнительное заземление" },
+  { q: "Какой цвет имеет защитное заземление?", a: ["Красный", "Желто-зеленый", "Черный", "Белый"], correct: "Желто-зеленый" },
+  { q: "Что такое механическое запирание?", a: ["Дверной замок", "Защита от ошибочных действий", "Сигнализация", "Ключ"], correct: "Защита от ошибочных действий" },
+  { q: "При каком напряжении обязательна маркировка кабеля?", a: ["50 В", "220 В", "380 В", "12 В"], correct: "380 В" },
+  { q: "Что входит в СИЗ при электромонтажных работах?", a: ["Очки", "Диэлектрические перчатки, коврик, инструмент", "Каска", "Лестница"], correct: "Диэлектрические перчатки, коврик, инструмент" },
+  { q: "Что запрещено в трансформаторной подстанции?", a: ["Мыть руки", "Хранить материалы", "Читать инструкции", "Открывать окна"], correct: "Хранить материалы" },
+  { q: "Какие действия при падении напряжения?", a: ["Отключить", "Сообщить и выяснить причину", "Продолжить", "Увеличить ток"], correct: "Сообщить и выяснить причину" },
+ { q: "Каковы нормы сопротивления заземляющего устройства?", a: ["1 Ом", "4 Ом", "Зависит от условий", "0 Ом"], correct: "Зависит от условий" },
+  { q: "Сколько должно быть заземляющих устройств на щитке?", a: ["1", "2", "3", "Не менее 2"], correct: "Не менее 2" },
+  { q: "Как проверить отсутствие напряжения?", a: ["Рукой", "Индикатором напряжения", "По документам", "Искрой"], correct: "Индикатором напряжения" },
+  { q: "Что делать при повреждении СИЗ?", a: ["Игнорировать", "Заменить и сообщить", "Продолжить", "Заклеить"], correct: "Заменить и сообщить" },
+  { q: "Какие работы проводятся без наряда?", a: ["Плановые ремонты", "Работы под напряжением", "Оперативные переключения", "Монтаж"], correct: "Оперативные переключения" },
+  { q: "Какая дистанция безопасна при напряжении 10 кВ?", a: ["1 м", "0.6 м", "0.8 м", "1.5 м"], correct: "1 м" },
+  { q: "Что такое взрывобезопасный инструмент?", a: ["Искробезопасный", "Металлический", "Обычный", "Деревянный"], correct: "Искробезопасный" },
+  { q: "Что делать, если один из членов бригады покинул рабочее место?", a: ["Продолжить", "Остановить работу и сообщить", "Заменить", "Записать в журнал"], correct: "Остановить работу и сообщить" },
+  { q: "Какие зоны считаются охраняемыми при ЛЭП?", a: ["Любые", "Под линией", "Определённые нормативами", "Под землёй"], correct: "Определённые нормативами" },
+  { q: "Что запрещено при работе с электроинструментом?", a: ["Работать во влажной среде", "Проверять изоляцию", "Осматривать инструмент", "Работать в спецодежде"], correct: "Работать во влажной среде" },
+ { q: "Какие документы оформляются после работ?", a: ["Накладная", "Протокол осмотра, закрытие наряда", "Фотография", "Акт выполненных работ"], correct: "Протокол осмотра, закрытие наряда" },
+   { q: "Что такое рабочее заземление?", a: ["Заземление корпуса", "Заземление для нормальной работы схемы", "Временное заземление", "Нейтраль"], correct: "Заземление для нормальной работы схемы" },
+  { q: "Что такое повторное заземление?", a: ["Резервное", "Дополнительное заземление", "В цепях нуля", "Сверх нормы"], correct: "Дополнительное заземление" },
+  { q: "Какой цвет имеет защитное заземление?", a: ["Красный", "Желто-зеленый", "Черный", "Белый"], correct: "Желто-зеленый" },
+  { q: "Что такое механическое запирание?", a: ["Дверной замок", "Защита от ошибочных действий", "Сигнализация", "Ключ"], correct: "Защита от ошибочных действий" },
+  { q: "Кто обязан выдавать распоряжения на работы?", a: ["Ответственный за электрохозяйство", "Начальник смены", "Любой работник", "Дежурный"], correct: "Ответственный за электрохозяйство" },
+  { q: "Сколько человек должно быть в бригаде при работах до 1000 В?", a: ["1", "2", "3", "4"], correct: "2" },
+  { q: "Что входит в СИЗ при электромонтажных работах?", a: ["Очки", "Диэлектрические перчатки, коврик, инструмент", "Каска", "Лестница"], correct: "Диэлектрические перчатки, коврик, инструмент" },
+  { q: "Что запрещено в трансформаторной подстанции?", a: ["Мыть руки", "Хранить материалы", "Читать инструкции", "Открывать окна"], correct: "Хранить материалы" },
+ { q: "Какие действия при падении напряжения?", a: ["Отключить", "Сообщить и выяснить причину", "Продолжить", "Увеличить ток"], correct: "Сообщить и выяснить причину" },
+  { q: "Какие нормы сопротивления заземляющего устройства?", a: ["1 Ом", "4 Ом", "Зависит от условий", "0 Ом"], correct: "Зависит от условий" },
+  { q: "Сколько должно быть заземляющих устройств на щитке?", a: ["1", "2", "3", "Не менее 2"], correct: "Не менее 2" },
+  { q: "Как проверить отсутствие напряжения?", a: ["Рукой", "Индикатором напряжения", "По документам", "Искрой"], correct: "Индикатором напряжения" },
+  { q: "Что делать при повреждении СИЗ?", a: ["Игнорировать", "Заменить и сообщить", "Продолжить", "Заклеить"], correct: "Заменить и сообщить" },
+  { q: "Какие работы проводятся без наряда?", a: ["Плановые ремонты", "Работы под напряжением", "Оперативные переключения", "Монтаж"], correct: "Оперативные переключения" },
+  { q: "Какая дистанция безопасна при напряжении 10 кВ?", a: ["1 м", "0.6 м", "0.8 м", "1.5 м"], correct: "1 м" },
+  { q: "Что такое взрывобезопасный инструмент?", a: ["Искробезопасный", "Металлический", "Обычный", "Деревянный"], correct: "Искробезопасный" },
+  { q: "Что делать, если один из членов бригады покинул рабочее место?", a: ["Продолжить", "Остановить работу и сообщить", "Заменить", "Записать в журнал"], correct: "Остановить работу и сообщить" },
+  { q: "Какие зоны считаются охраняемыми при ЛЭП?", a: ["Любые", "Под линией", "Определённые нормативами", "Под землёй"], correct: "Определённые нормативами" },
+ { q: "Что запрещено при работе с электроинструментом?", a: ["Работать во влажной среде", "Проверять изоляцию", "Осматривать инструмент", "Работать в спецодежде"], correct: "Работать во влажной среде" },
+  { q: "Какие документы оформляются после работ?", a: ["Накладная", "Протокол осмотра, закрытие наряда", "Фотография", "Акт выполненных работ"], correct: "Протокол осмотра, закрытие наряда" },
+    { q: "Что такое рабочее заземление?", a: ["Заземление корпуса", "Заземление для нормальной работы схемы", "Временное заземление", "Нейтраль"], correct: "Заземление для нормальной работы схемы" },
+  { q: "Что такое повторное заземление?", a: ["Резервное", "Дополнительное заземление", "В цепях нуля", "Сверх нормы"], correct: "Дополнительное заземление" },
+  { q: "Какой цвет имеет защитное заземление?", a: ["Красный", "Желто-зеленый", "Черный", "Белый"], correct: "Желто-зеленый" },
+  { q: "Что такое механическое запирание?", a: ["Дверной замок", "Защита от ошибочных действий", "Сигнализация", "Ключ"], correct: "Защита от ошибочных действий" },
+  { q: "При каком напряжении обязательна маркировка кабеля?", a: ["50 В", "220 В", "380 В", "12 В"], correct: "380 В" },
+  { q: "Что входит в СИЗ при электромонтажных работах?", a: ["Очки", "Диэлектрические перчатки, коврик, инструмент", "Каска", "Лестница"], correct: "Диэлектрические перчатки, коврик, инструмент" },
+  { q: "Что запрещено в трансформаторной подстанции?", a: ["Мыть руки", "Хранить материалы", "Читать инструкции", "Открывать окна"], correct: "Хранить материалы" },
+  ],
+  uz: [
+   { q: "Elektr o‘tkazgich qismlarga teginishning asosiy xavfi nima?", a: ["Uyalish", "Tok urishi", "Yong‘in", "Shovqin"], correct: "Tok urishi" },
+  { q: "Qaysi hujjat elektrda ishlash uchun ruxsat beradi?", a: ["Buyruq", "Ruxsatnoma", "Buyurtma", "Ko‘rsatma"], correct: "Ruxsatnoma" },
+  { q: "Zamonaviy elektrotexnika xavfsizlik vositalariga nimalar kiradi?", a: ["Faqat qo‘lqop", "Dielektrik qo‘lqop, gilam, asboblar", "Asboblar", "Faqat gilam"], correct: "Dielektrik qo‘lqop, gilam, asboblar" },
+  { q: "O‘ta xavfli zona bu:", a: ["Yoritilgan zona", "Tashqi maydon", "Yuqori voltli qismlar yaqinidagi zona", "Zamin"], correct: "Yuqori voltli qismlar yaqinidagi zona" },
+  { q: "Zaminlashning asosiy vazifasi nima?", a: ["Isitish", "Zaryadni to‘plash", "Odamni tokdan himoya qilish", "Signal berish"], correct: "Odamni tokdan himoya qilish" },
+  { q: "Ruxsatnoma qachon haqiqiy hisoblanmaydi?", a: ["Sana yo‘q", "To‘ldirilmagan", "O‘zgartirilgan", "Yuqoridagilarning barchasi"], correct: "Yuqoridagilarning barchasi" },
+  { q: "Kimlar ruxsatsiz elektr uskunasida ishlay olmaydi?", a: ["Foydalanuvchilar", "Tashrif buyuruvchilar", "Tayyorlanmagan xodimlar", "Xavfsizlik xodimlari"], correct: "Tayyorlanmagan xodimlar" },
+  { q: "Dielektrik qo‘lqoplar har necha oyda sinovdan o‘tkaziladi?", a: ["12 oyda", "6 oyda", "3 oyda", "1 oyda"], correct: "6 oyda" },
+  { q: "Tok o‘tishi paytida birinchi yordam nima?", a: ["Tokni o‘chirish va yordam berish", "Kuzatish", "Ruxsat kutish", "Hujjat to‘ldirish"], correct: "Tokni o‘chirish va yordam berish" },
+  { q: "Ruxsatnomani kim beradi?", a: ["Ishlab chiqaruvchi", "Nazoratchi", "Elektr xo‘jaligi uchun mas'ul shaxs", "Xavfsizlik xodimi"], correct: "Elektr xo‘jaligi uchun mas'ul shaxs" },
+
+  { q: "Elektr toki odamga qanday ta’sir qiladi?", a: ["Quvvat beradi", "Sog‘lomlashtiradi", "Hayot uchun xavf tug‘diradi", "Yorug‘lik chiqaradi"], correct: "Hayot uchun xavf tug‘diradi" },
+  { q: "Zaminlash simining rangi qanday bo‘ladi?", a: ["Qizil", "Sariq-yashil", "Ko‘k", "Oq"], correct: "Sariq-yashil" },
+  { q: "Elektr tokiga urilgan odamni qanday ozod qilish kerak?", a: ["Qo‘l bilan", "Dielektrik vositalar bilan", "Suv bilan", "To‘xtab turish kerak"], correct: "Dielektrik vositalar bilan" },
+  { q: "Qanday hollarda ishni to‘xtatish kerak?", a: ["Havo bulutli bo‘lsa", "Yoritish past bo‘lsa", "Hodim yo‘qolsa", "Zaminlash yo‘q bo‘lsa"], correct: "Zaminlash yo‘q bo‘lsa" },
+  { q: "Elektrda ishlashda xavfsizlik belgilarining vazifasi nima?", a: ["Reklama", "Yo‘naltirish", "Ogohlantirish va taqiqlash", "Chiroy"], correct: "Ogohlantirish va taqiqlash" },
+  { q: "Operativ xodimlar nima qiladi?", a: ["Tozalaydi", "Suv beradi", "Elektr tizimida boshqaruv va nazorat qiladi", "Nazorat daftarini yuritadi"], correct: "Elektr tizimida boshqaruv va nazorat qiladi" },
+  { q: "Zarur hollarda zaminlash qanday qo‘llaniladi?", a: ["Faqat past kuchlanishda", "Faqat yomg‘irda", "Ishdan oldin va ish davomida", "Hech qachon"], correct: "Ishdan oldin va ish davomida" },
+  { q: "SIZ (shaxsiy himoya vositalari) tarkibiga nima kiradi?", a: ["Futbolka", "Gilam, qo‘lqop, ko‘zoynak", "Quloqchin", "Salfetka"], correct: "Gilam, qo‘lqop, ko‘zoynak" },
+  { q: "Ish joyi qanday tayyorlanadi?", a: ["Tozalash", "Yoritish", "O‘chirish, zaminlash, plakatlar", "Ruxsat kutish"], correct: "O‘chirish, zaminlash, plakatlar" },
+  { q: "Ruxsatnoma asosida ishlaydiganlar kimlar?", a: ["Har kim", "Tayyorlangan brigada", "Faol foydalanuvchi", "Xodimlar ruxsatsiz"], correct: "Tayyorlangan brigada" },
+ { q: "Ogohlantiruvchi plakat bu nima?", a: ["\"Kirmang! Uradi!\"", "Yong‘in xavfsizligi", "Reklama plakati", "Jadval"], correct: "\"Kirmang! Uradi!\"" },
+  { q: "Dielektrik qo‘lqoplar qachon tekshiriladi?", a: ["Yiliga bir marta", "Har 6 oyda", "Har 3 oyda", "Oyiga bir marta"], correct: "Har 6 oyda" },
+  { q: "Elektr toki urganida qanday choralar ko‘riladi?", a: ["Rahbarga xabar berish", "Rasmga tushirish", "Tokni uzib, birinchi yordam ko‘rsatish", "Politsiyani chaqirish"], correct: "Tokni uzib, birinchi yordam ko‘rsatish" },
+  { q: "Tok ostida ishlashda qanday asboblar ishlatiladi?", a: ["Oddiy metall asboblar", "Faqat yerlangan", "Izolyatsiyalangan dastakli asboblar", "Plastik bolg‘alar"], correct: "Izolyatsiyalangan dastakli asboblar" },
+  { q: "Operativ blokirovka bu nima?", a: ["Kirishdan himoya", "Noto‘g‘ri ulanishlarning oldini olish vositasi", "Boshqaruv paneliga kirish", "Eshik qulfi"], correct: "Noto‘g‘ri ulanishlarning oldini olish vositasi" },
+  { q: "“Bu yerda ishlash” belgisi nimani anglatadi?", a: ["Harakatlanishga ruxsat", "Ish bajariladigan joy ko‘rsatkichi", "Ogohlantirish", "Ahamsiz belgi"], correct: "Ish bajariladigan joy ko‘rsatkichi" },
+  { q: "Yerga ulash moslamasini sinash nima?", a: ["Tokni tekshirish", "Tarqalish qarshiligini o‘lchash", "Bo‘yoq borligini tekshirish", "Bolt birikmasini ko‘rish"], correct: "Tarqalish qarshiligini o‘lchash" },
+  { q: "“Elektr xavfsizligi” termini nimani anglatadi?", a: ["Yong‘in xavfsizligi", "Elektr tokidan himoya holati", "Balandlikda ishlash texnikasi", "Qisqa tutashuvlardan binoni himoya qilish"], correct: "Elektr tokidan himoya holati" },
+  { q: "Mehnat muhofazasi bo‘yicha yo‘riqnoma kim tomonidan o‘tkaziladi?", a: ["Buxgalter", "Mehnat muhofazasi muhandisi", "Har qanday ishchi", "Qo‘riqchi"], correct: "Mehnat muhofazasi muhandisi" },
+  { q: "Qachon ruxsatnoma haqiqiy hisoblanmaydi?", a: ["Sana yo‘q", "Qalam bilan imzolangan", "Vaqti o‘zgartirilgan", "Yuqoridagilarning barchasi"], correct: "Yuqoridagilarning barchasi" },
+
+  { q: "Elektr o‘rnatmalarda dubulg‘asiz ishlash mumkinmi?", a: ["Mumkin", "Faqat balandlikda", "Taqiqlanadi", "Rahbar ruxsati bilan"], correct: "Taqiqlanadi" },
+  { q: "30 daqiqadan ortiq tanaffusda nima qilish kerak?", a: ["Ishni davom ettirish", "Qaytadan yo‘riqnoma o‘tish", "Kiyim almashtirish", "Jurnalga yozish"], correct: "Qaytadan yo‘riqnoma o‘tish" },
+  { q: "Qaysi guruhdan mustaqil ishlashga ruxsat beriladi?", a: ["I", "II", "III", "IV"], correct: "III" },
+  { q: "Maxsus kiyim uchun talablar qanday?", a: ["Har qanday", "Ko‘k rangda", "Dielektrik, himoya", "Paxtali"], correct: "Dielektrik, himoya" },
+  { q: "Ko‘rikdan so‘ng uskuna qanday yoqiladi?", a: ["Signal bo‘yicha", "Yerga ulash tekshirilgach", "Darhol", "Jadvalga ko‘ra"], correct: "Yerga ulash tekshirilgach" },
+  { q: "Kim ishlar uchun ko‘rsatma berishi mumkin?", a: ["Elektr xo‘jaligi uchun mas’ul", "Navbatchi rahbar", "Har qanday ishchi", "Navbatchi elektrchi"], correct: "Elektr xo‘jaligi uchun mas’ul" },
+  { q: "1000 V gacha ishlarda brigadada nechta odam bo‘lishi kerak?", a: ["1", "2", "3", "4"], correct: "2" },
+  { q: "Tok inson organizmiga ta’sir qilganda qanday belgilar bo‘ladi?", a: ["Issiqlik", "Qaltirash, hushni yo‘qotish", "Ochlik", "Charchoq"], correct: "Qaltirash, hushni yo‘qotish" },
+  { q: "Elektr uzatish liniyalari (EUL)da qanday hududlar muhofaza qilinadi?", a: ["Istalgan", "Chiziq osti", "Me’yor bilan belgilangani", "Yer osti"], correct: "Me’yor bilan belgilangani" },
+  { q: "Elektr asboblar bilan ishlaganda nima taqiqlanadi?", a: ["Nam muhitda ishlash", "Izolyatsiyani tekshirish", "Asbobni ko‘rikdan o‘tkazish", "Maxsus kiyimda ishlash"], correct: "Nam muhitda ishlash" },
+ { q: "Ish tugagandan so‘ng qanday hujjatlar rasmiylashtiriladi?", a: ["Yuk xati", "Ko‘rik protokoli, ruxsatnomani yopish", "Rasm", "Bajarilgan ishlar dalolatnomasi"], correct: "Ko‘rik protokoli, ruxsatnomani yopish" },
+  { q: "O‘chirish moslamasi bu nima?", a: ["Tugma", "Elektrni uzib qo‘yadigan qurilma", "Transformator", "Termometr"], correct: "Elektrni uzib qo‘yadigan qurilma" },
+  { q: "Ishchi yerga ulash nima?", a: ["Korpusni yerga ulash", "Sxemaning normal ishlashi uchun yerga ulash", "Vaqtinchalik yerga ulash", "Nol sim"], correct: "Sxemaning normal ishlashi uchun yerga ulash" },
+  { q: "Qayta yerga ulash nima?", a: ["Zaxira", "Qo‘shimcha yerga ulash", "Nol zanjirida", "Me’yor ortiqli"], correct: "Qo‘shimcha yerga ulash" },
+  { q: "Himoya yerga ulash qanday rangda bo‘ladi?", a: ["Qizil", "Sariq-yashil", "Qora", "Oq"], correct: "Sariq-yashil" },
+  { q: "Mexanik qulf nima?", a: ["Eshik qulf", "Noto‘g‘ri harakatlardan himoya", "Signalizatsiya", "Kalit"], correct: "Noto‘g‘ri harakatlardan himoya" },
+  { q: "Qaysi kuchlanishda kabel belgilanishi majburiy?", a: ["50 V", "220 V", "380 V", "12 V"], correct: "380 V" },
+  { q: "Elektrmontaj ishlarida qanday SIZ ishlatiladi?", a: ["Ko‘zoynak", "Dielektrik qo‘lqop, gilam, asbob", "Dubulg‘a", "Narsalar olish uchun narvon"], correct: "Dielektrik qo‘lqop, gilam, asbob" },
+  { q: "Transformator punktida nima taqiqlanadi?", a: ["Qo‘l yuvish", "Materiallar saqlash", "Yo‘riqnoma o‘qish", "Derazani ochish"], correct: "Materiallar saqlash" },
+  { q: "Kuchlanish tushganda qanday chora ko‘riladi?", a: ["O‘chirish", "Xabar berish va sababini aniqlash", "Davom ettirish", "Tokni oshirish"], correct: "Xabar berish va sababini aniqlash" }
+   ]
+};
+
+// ✅ Глобальные переменные
+let currentLang = "ru";
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+let userAnswers = [];
+let fullName = "";
+const SELECTED_QUESTIONS = 20;
+let timerInterval;
+let timeLeft = 900; // 15 минут в секундах
+
+// ✅ Переключение языка
+function updateLang() {
+  currentLang = document.getElementById("langSelect").value;
+}
+
+// ✅ Получить случайные вопросы
+function getQuestionsByLang(lang) {
+  const q = [...allQuestions[lang]];
+  shuffle(q);
+  return q.slice(0, SELECTED_QUESTIONS);
+}
+
+// ✅ Запуск теста после авторизации
+function startTest() {
+  fullName = document.getElementById("fioSelect").value;
+  const password = document.getElementById("passwordInput").value;
+
+  // Проверка ввода
+  if (!fullName || !password) {
+    alert(currentLang === "ru" ? "Введите ФИО и пароль!" : "F.I.O. va parolni kiriting!");
+    return;
+  }
+
+  // Проверка пароля
+  if (users[fullName] !== password) {
+    alert(currentLang === "ru" ? "Неверный пароль!" : "Parol noto‘g‘ri!");
+    return;
+  }
+
+  // Запускаем тест
+  questions = getQuestionsByLang(currentLang);
+  document.getElementById("startSection").style.display = "none";
+  document.getElementById("quizForm").style.display = "block";
+  showQuestion();
+  startTimer();
+}
+
+// ✅ Отображение текущего вопроса
+function showQuestion() {
+  const q = questions[currentQuestion];
+  const block = document.getElementById("questionBlock");
+
+  block.innerHTML = `<p><strong>${currentLang === "ru" ? "Вопрос" : "Savol"} ${currentQuestion + 1}:</strong> ${q.q}</p>` +
+    q.a.map(opt =>
+      `<label><input type="radio" name="answer" value="${opt}"> ${opt}</label><br>`
+    ).join("");
+}
+
+// ✅ Переход к следующему вопросу
+function nextQuestion() {
+  const selected = document.querySelector('input[name="answer"]:checked');
+  if (!selected) {
+    alert(currentLang === "ru" ? "Выберите ответ!" : "Javobni tanlang!");
+    return;
+  }
+
+  const answer = selected.value;
+  const correct = questions[currentQuestion].correct;
+
+  if (answer === correct) score++;
+
+  userAnswers.push({ q: questions[currentQuestion].q, answer: answer, correct: correct });
+
+  currentQuestion++;
+  if (currentQuestion < SELECTED_QUESTIONS) {
+    showQuestion();
+  } else {
+    submitQuiz();
+  }
+}
+
+// ✅ Старт таймера
+function startTimer() {
+  const timerDisplay = document.getElementById("timer");
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const min = Math.floor(timeLeft / 60);
+    const sec = timeLeft % 60;
+    timerDisplay.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      submitQuiz();
+    }
+  }, 1000);
+}
+
+// ✅ Завершение теста и вывод результатов
+function submitQuiz() {
+  clearInterval(timerInterval);
+  document.getElementById("quizForm").style.display = "none";
+  document.getElementById("resultBlock").style.display = "block";
+
+  const passed = score >= Math.ceil(SELECTED_QUESTIONS * 0.7);
+  const status = passed
+    ? (currentLang === "ru" ? "СДАН" : "TOPSHIRILDI")
+    : (currentLang === "ru" ? "НЕ СДАН" : "TOPSHIRILMADI");
+
+  const now = new Date().toLocaleString("ru-RU");
+
+  document.getElementById("resultText").textContent =
+    (currentLang === "ru"
+      ? `Результат: ${score} из ${SELECTED_QUESTIONS}. Статус: ${status}`
+      : `Natija: ${SELECTED_QUESTIONS} dan ${score} ta. Holat: ${status}`);
+
+  // Сбор подробной информации
+  let details = currentLang === "ru" ? `📋 Подробности теста:\n` : `📋 Test tafsilotlari:\n`;
+  userAnswers.forEach((item, i) => {
+    const mark = item.answer === item.correct ? "✔️" : "❌";
+    details += `${i + 1}) ${item.q}\n${currentLang === "ru" ? "Ответ" : "Javob"}: ${item.answer}\n${currentLang === "ru" ? "Верно" : "To‘g‘ri"}: ${item.correct} ${mark}\n\n`;
+  });
+
+  // Подготовка сообщения для Telegram
+  const msg = (currentLang === "ru"
+    ? `Результат теста АКБК:\n👤 Ф.И.О.: ${fullName}\n🌐 Язык: ${currentLang.toUpperCase()}\n📊 Баллы: ${score} из ${SELECTED_QUESTIONS}\n📅 Дата/время: ${now}\n📌 Статус: ${status}\n\n${details}`
+    : `AKBK test natijasi:\n👤 F.I.Sh.: ${fullName}\n🌐 Til: ${currentLang.toUpperCase()}\n📊 Ball: ${SELECTED_QUESTIONS} dan ${score} ta\n📅 Sana/vaqt: ${now}\n📌 Holat: ${status}\n\n${details}`);
+
+  // ✅ Отправка в Telegram (чат ID и токен заданы)
+  fetch("https://api.telegram.org/bot7649401218:AAHiULqQqqchT_C7tIKPjeXXdKIKJ27woi0/sendMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: 136110953, // Ваш Telegram ID или канал
+      text: msg
+    })
+  });
+}
+
+// ✅ Перемешивание массива вопросов
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+</script>
+</body>
+</html>
