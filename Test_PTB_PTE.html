@@ -860,7 +860,9 @@ async function submitQuiz() {
     details += `${i + 1}) ${item.q}\n${currentLang === "ru" ? "Ответ" : "Javob"}: ${item.answer}\n${currentLang === "ru" ? "Верно" : "To‘g‘ri"}: ${item.correct} ${mark}\n\n`;
   });
 
-  const msg = currentLang === "ru"
+ const divisionName = document.getElementById("divisionSelect").selectedOptions[0].textContent;
+
+const msg = currentLang === "ru"
   ? `Результат теста АКБК:\n👤 Ф.И.О.: ${fullName}\n🏢 Подразделение: ${divisionName}\n📊 Баллы: ${score} из ${SELECTED_QUESTIONS}\n📌 Статус: ${status}\n📅 ${now}\n\n${details}`
   : `AKBK test natijasi:\n👤 F.I.Sh.: ${fullName}\n🏢 Bo‘lim: ${divisionName}\n📊 Ball: ${score} / ${SELECTED_QUESTIONS}\n📌 Holat: ${status}\n📅 ${now}\n\n${details}`;
 
