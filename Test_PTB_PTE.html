@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿
+
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -6,8 +8,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.7.0/docx.umd.min.js"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1f3d; color: #fff; margin: 0; padding: 40px 20px; }
-    .container { max-width: 700px; margin: auto; background: #1e2f53; border-radius: 12px; padding: 30px; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4); }
-    h2 { text-align: center; font-size: 24px; margin-bottom: 25px; }
+    .container { max-width: 800px; margin: auto; background: #1e2f53; border-radius: 12px; padding: 30px; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4); }
+    h2 { text-align: center; font-size: 22px; margin-bottom: 25px; }
     select, input[type="password"] {
       padding: 10px; font-size: 16px; width: 100%; max-width: 400px; margin-bottom: 15px;
       border: 1px solid #ccc; border-radius: 6px; background: #ffffff; color: #000;
@@ -768,51 +770,43 @@ function getQuestionsByLang(lang) {
   return [...qbank].sort(() => 0.5 - Math.random()).slice(0, SELECTED_QUESTIONS);
 }
 function startTest() {
-  fullName = document.getElementById("fioSelect").value;
+  const fullName = document.getElementById("fioSelect").value;
   const password = document.getElementById("passwordInput").value;
 
-  // Проверка попыток
-  const attemptsKey = `attempts_${fullName}`;
-  const attempts = localStorage.getItem(attemptsKey) || 0;
-
-  if (attempts >= 2) {
-    alert("Превышено максимальное количество попыток (2). Обратитесь к администратору.");
+  if (!currentDivision || !fullName || !password) {
+    alert(currentLang === "ru" ? "Заполните все поля!" : "Barcha maydonlarni to‘ldiring!");
     return;
   }
 
-  // Проверка ввода
-  if (!fullName || !password) {
-    alert(currentLang === "ru" ? "Введите ФИО и пароль!" : "F.I.O. va parolni kiriting!");
+  // Проверка количества попыток
+  const attemptsKey = `attempts_${currentDivision}_${fullName}`;
+  const attempts = parseInt(localStorage.getItem(attemptsKey)) || 0;
+
+  if (attempts >= 2) {
+    alert(currentLang === "ru"
+      ? "Превышено максимальное количество попыток (2). Обратитесь к администратору."
+      : "Maksimal urinishlar soni (2) oshib ketdi. Administratorga murojaat qiling.");
     return;
   }
 
   // Проверка пароля
-  if (users[fullName] !== password) {
+  const divisionUsers = divisions[currentDivision]?.users;
+  if (!divisionUsers || divisionUsers[fullName] !== password) {
     alert(currentLang === "ru" ? "Неверный пароль!" : "Parol noto‘g‘ri!");
     return;
   }
 
   // Увеличение количества попыток
-  localStorage.setItem(attemptsKey, parseInt(attempts) + 1);
+  localStorage.setItem(attemptsKey, attempts + 1);
 
-  // Запускаем тест
+  // Запуск теста
   questions = getQuestionsByLang(currentLang);
   document.getElementById("startSection").style.display = "none";
   document.getElementById("quizForm").style.display = "block";
   showQuestion();
   startTimer();
 }
-function startTest() {
-  fullName = document.getElementById("fioSelect").value;
-  const password = document.getElementById("passwordInput").value;
-  if (!currentDivision || !fullName || !password) return alert("Заполните все поля!");
-  if (divisions[currentDivision].users[fullName] !== password) return alert("Неверный пароль!");
-  questions = getQuestionsByLang(currentLang);
-  document.getElementById("startSection").style.display = "none";
-  document.getElementById("quizForm").style.display = "block";
-  showQuestion();
-  startTimer();
-}
+
 function showQuestion() {
   const q = questions[currentQuestion];
   document.getElementById("questionBlock").innerHTML =
