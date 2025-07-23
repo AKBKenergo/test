@@ -770,7 +770,7 @@ function getQuestionsByLang(lang) {
   return [...qbank].sort(() => 0.5 - Math.random()).slice(0, SELECTED_QUESTIONS);
 }
 function startTest() {
-  const fullName = document.getElementById("fioSelect").value;
+  fullName = document.getElementById("fioSelect").value;
   const password = document.getElementById("passwordInput").value;
 
   if (!currentDivision || !fullName || !password) {
