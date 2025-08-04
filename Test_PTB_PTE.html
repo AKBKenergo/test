@@ -1045,6 +1045,7 @@ async function buildDocx(fullName, division, scoreText, statusText, dateTime, de
           alignment: AlignmentType.CENTER,
           children: [new TextRun({ text: "Проверки знаний ПТЭ и ПТБ", bold: true, size: 18 })]
         }),
+new Paragraph(""),
         new Paragraph({
           alignment: AlignmentType.CENTER,
           children: [new TextRun({ text: "ПРОТОКОЛ №____", bold: true, size: 28 })]
@@ -1094,9 +1095,10 @@ async function buildDocx(fullName, division, scoreText, statusText, dateTime, de
 
 // Отправка DOCX-файла в Telegram
 async function sendDocToTelegram(blob, fullName) {
-  const formData = new FormData();
-  formData.append("chat_id", "136110953"); // ваш ID
-  formData.append("document", blob, `Тест_${fullName.replace(/ /g, "_")}.docx`);
+ const formData = new FormData();
+  formData.append("chat_id", "136110953"); // ваш chat_id
+  const fileName = `${fullName.replace(/ /g, "_")}.docx`; // Только ФИО в названии файла
+  formData.append("document", blob, fileName);
 
   const response = await fetch("https://api.telegram.org/bot7649401218:AAHiULqQqqchT_C7tIKPjeXXdKIKJ27woi0/sendDocument", {
     method: "POST",
