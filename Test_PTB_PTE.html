@@ -380,6 +380,7 @@ div2: {
    "Майер Виктория Томасовна": "1912",
    "Муратова Гульсина Иброхимовна": "0405",
 "Сирожитдинов Александр Раисович": "0610",
+"Остапенко Таисия Николаевна": "3107",
   },
     questions: {
        ru: [
@@ -1046,6 +1047,7 @@ async function buildDocx(fullName, division, scoreText, statusText, dateTime, de
           alignment: AlignmentType.CENTER,
           children: [new TextRun({ text: "Проверки знаний ПТЭ и ПТБ", bold: true, size: 18 })]
         }),
+new Paragraph(""),
 new Paragraph(""),
         new Paragraph({
           alignment: AlignmentType.CENTER,
